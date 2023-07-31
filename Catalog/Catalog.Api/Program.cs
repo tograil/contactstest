@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Catalog.Core.Contacts;
+using Catalog.Integration.Services;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +15,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<ContactContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddIdentity<CatalogUser, IdentityRole<Guid>>()
+builder.Services.AddScoped<IContactService, ContactService>();
+
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+    builder.Services.AddIdentity<CatalogUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ContactContext>()
     .AddDefaultTokenProviders();
 
@@ -39,7 +45,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Test01", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Catalog", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
